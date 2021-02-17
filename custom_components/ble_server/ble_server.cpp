@@ -10,37 +10,35 @@ namespace esp32_ble_server {
 
 static const char *TAG = "esp32_ble_server";
 
-static const char *SERVICE_UUID  = "03774663-d5d6-49e8-8d38-377466300000";
-static const char *VERSION_UUID  = "03774663-d5d6-49e8-8d38-377466300001";
+static const char *DEVICE_INFORMATION_SERVICE_UUID = "180A";
+static const char *VERSION_UUID = "2A26";
+static const char *MANUFACTURER_UUID = "2A29";
+
 
 ESP32BLEServer::ESP32BLEServer() { global_ble_server = this; }
 
 void ESP32BLEServer::setup() {
   BLEDevice::init(App.get_name());
-  ESP_LOGD(TAG, "Set BLE MTU result = %d", BLEDevice::setMTU(256));
-  ESP_LOGD(TAG, "Get BLE MTU = %d", BLEDevice::getMTU());
   this->server_ = BLEDevice::createServer();
   this->server_->setCallbacks(new ESP32BLEServerCallback());
 
-  BLEService *service = this->server_->createService(SERVICE_UUID);
-
-  BLECharacteristic *version = service->createCharacteristic(
+  BLEService *device_information_service = this->server_->createService(DEVICE_INFORMATION_SERVICE_UUID);
+  BLECharacteristic *version = device_information_service->createCharacteristic(
                                   VERSION_UUID,
                                   BLECharacteristic::PROPERTY_READ
                                 );
   version->setValue(ESPHOME_VERSION);
-
-  BLEDescriptor *version_descriptor = new BLE2902();
-  version_descriptor->setValue("ESPHome Version");
-  version->addDescriptor(version_descriptor);
-
-  service->start();
+  BLECharacteristic *manufacturer = device_information_service->createCharacteristic(
+                                  MANUFACTURER_UUID,
+                                  BLECharacteristic::PROPERTY_READ
+                                );
+  manufacturer->setValue("ESPHome");
+  device_information_service->start();
 
   BLEAdvertising *advertising = BLEDevice::getAdvertising();
-  advertising->addServiceUUID(SERVICE_UUID);
   advertising->setScanResponse(true);
-  advertising->setMinPreferred(0x06);  // functions that help with iPhone connections issue
-  advertising->setMinPreferred(0x12);
+  advertising->setMinPreferred(0x06);
+
   BLEDevice::startAdvertising();
 }
 
