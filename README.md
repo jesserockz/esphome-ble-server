@@ -6,8 +6,7 @@ It allows other components (or code) to register their own services and characte
 
 ## Installation
 
-Installation can be via [HACS](https://hacs.xyz) or by downloading and placing the 
-[ble_server](custom_components/ble_server) folder inside your **esphome** custom_components folder.
+Install by downloading and placing the [ble_server](custom_components/ble_server) folder inside your **esphome** custom_components folder.
 
 ## Configuration
 
